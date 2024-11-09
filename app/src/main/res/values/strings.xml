@@ -1,0 +1,22 @@
+<resources>
+    <string name="app_name">BottomNavigationView</string>
+    <string name="title_Profile">Profile</string>
+    <string name="title_Weather">Weather</string>
+    <string name="title_Notes">Notes</string>
+    <string name="api_key">543f4defbbcf1295555259591501abe9</string>
+    <string name="exit">Выход</string>
+    <string name="fr2">Узнайте текущую погоду в вашем регионе!</string>
+    <string name="fr3">Следите за погодой с нашим приложением!</string>
+    <string name="fr1">Добро пожаловать в Weather App!</string>
+    <string name="atmos">Атмосферное давление</string>
+    <string name="vlazh">Влажность</string>
+    <string name="min_temp">Мин. температура</string>
+    <string name="max_temp">Макс. температура</string>
+    <string name="speed">Скорость</string>
+    <string name="degree">Направление</string>
+    <string name="temp">t℃</string>
+    <string name="city">Город</string>
+    <string name="location">Местоположение</string>
+    <string name="get_data">Получить данные</string>
+    <string name="input_city">Введите город</string>
+</resources>
