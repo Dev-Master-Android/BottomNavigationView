@@ -1,25 +1,25 @@
 package com.example.bottomnavigationview.ui.fragments
 
 import android.annotation.SuppressLint
+import android.content.Context
 import android.content.pm.PackageManager
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Button
-import android.widget.EditText
-import android.widget.ImageView
-import android.widget.TextView
 import android.widget.Toast
 import androidx.core.app.ActivityCompat
+import androidx.core.content.ContentProviderCompat.requireContext
+
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import com.example.bottomnavigationview.R
 import com.example.bottomnavigationview.databinding.FragmentWeatherBinding
-import com.example.bottomnavigationview.viewmodel.WeatherViewModel
-import com.example.retrofiteweatherapi.utils.RetrofitInstance
+import com.example.bottomnavigationview.data.model.weatherRetrofit.utils.RetrofitInstance
+import com.example.bottomnavigationview.databinding.FragmentPersonalInfoBinding
 import com.google.android.gms.location.LocationServices
 import com.squareup.picasso.Picasso
+import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
@@ -27,48 +27,33 @@ import kotlinx.coroutines.withContext
 import retrofit2.HttpException
 import java.io.IOException
 
-class WeatherFragment : Fragment(R.layout.fragment_weather) {
-    private lateinit var temperatureTV: TextView
-    private lateinit var maxTemperatureTV: TextView
-    private lateinit var minTemperatureTV: TextView
-    private lateinit var cityTV: TextView
-    private lateinit var weatherIV: ImageView
-    private lateinit var windDegreeTV: TextView
-    private lateinit var windSpeedTV: TextView
-    private lateinit var pressureTV: TextView
-    private lateinit var humidityTV: TextView
-    private lateinit var editTextET: EditText
-    private lateinit var searchBTN: Button
-    private lateinit var locationBTN: Button
-
+class WeatherFragment() :
+    Fragment() {
+    private lateinit var binding: FragmentWeatherBinding
+    override fun onCreateView(
+        inflater: LayoutInflater, container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
+        binding = FragmentWeatherBinding.inflate(inflater, container, false)
+        return binding.root
+    }
     @SuppressLint("MissingInflatedId")
-    override fun onViewCreated(view: android.view.View, savedInstanceState: Bundle?) {
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        temperatureTV = view.findViewById(R.id.temperature_tv)
-        maxTemperatureTV = view.findViewById(R.id.max_temperature_tv)
-        minTemperatureTV = view.findViewById(R.id.min_temperature_tv)
-        humidityTV = view.findViewById(R.id.humidity_tv)
-        cityTV = view.findViewById(R.id.city_tv)
-        editTextET = view.findViewById(R.id.et_city)
-        weatherIV = view.findViewById(R.id.weather_iv)
-        windDegreeTV = view.findViewById(R.id.wind_degree_tv)
-        windSpeedTV = view.findViewById(R.id.wind_speed_tv)
-        pressureTV = view.findViewById(R.id.pressure_tv)
-        searchBTN = view.findViewById(R.id.btn_search)
-        locationBTN = view.findViewById(R.id.btn_location)
-
-        searchBTN.setOnClickListener {
-            searchCity()
+        binding.btnSearch.setOnClickListener {
+           searchCity()
         }
 
-        locationBTN.setOnClickListener {
+        binding.btnLocation.setOnClickListener {
             getCurrentLocation()
         }
     }
 
+    @OptIn(DelicateCoroutinesApi::class)
+    @SuppressLint("SetTextI18n")
     private fun searchCity() {
-        val city = editTextET.text.toString()
+        val city = binding.etCity.text.toString()
         if (city.isEmpty()) {
             Toast.makeText(
                 context,
@@ -108,23 +93,25 @@ class WeatherFragment : Fragment(R.layout.fragment_weather) {
             if (response.isSuccessful && response.body() != null) {
                 withContext(Dispatchers.Main) {
                     val data = response.body()!!
-                    cityTV.text = data.name
-                    temperatureTV.text = "${data.main.temp} °C"
-                    maxTemperatureTV.text = "Макс: ${data.main.temp_max} °C"
-                    minTemperatureTV.text = "Мин: ${data.main.temp_min} °C"
-                    windDegreeTV.text = "Направление ветра: ${data.wind.deg}°"
-                    windSpeedTV.text = "Скорость ветра: ${data.wind.speed} м/с"
+                    binding.cityTv.text = data.name
+                    binding.temperatureTv.text = "${data.main.temp} °C"
+                    binding.maxTemperatureTv.text = "Макс: ${data.main.temp_max} °C"
+                    binding.minTemperatureTv.text = "Мин: ${data.main.temp_min} °C"
+                    binding.windDegreeTv.text = "Направление ветра: ${data.wind.deg}°"
+                    binding.windSpeedTv.text = "Скорость ветра: ${data.wind.speed} м/с"
                     val convertPressure = (data.main.pressure / 1.33).toInt()
-                    pressureTV.text = "Давление: $convertPressure мм рт. ст."
-                    humidityTV.text = "Влажность: ${data.main.humidity}%"
+                    binding.pressureTv.text = "Давление: $convertPressure мм рт. ст."
+                    binding.humidityTv.text = "Влажность: ${data.main.humidity}%"
                     val iconId = data.weather[0].icon
                     val iconUrl = "https://openweathermap.org/img/wn/$iconId@4x.png"
-                    Picasso.get().load(iconUrl).into(weatherIV)
+                    Picasso.get().load(iconUrl).into(binding.weatherIv)
                 }
             }
         }
     }
 
+    @SuppressLint("SetTextI18n")
+    @OptIn(DelicateCoroutinesApi::class)
     private fun getCurrentLocation() {
         val fusedLocationClient = LocationServices.getFusedLocationProviderClient(requireContext())
 
@@ -184,22 +171,24 @@ class WeatherFragment : Fragment(R.layout.fragment_weather) {
                         if (response.isSuccessful && response.body() != null) {
                             withContext(Dispatchers.Main) {
                                 val data = response.body()!!
-                                cityTV.text = data.name
-                                temperatureTV.text = "${data.main.temp} °C"
-                                maxTemperatureTV.text = "Макс: ${data.main.temp_max} °C"
-                                minTemperatureTV.text = "Мин: ${data.main.temp_min} °C"
-                                windDegreeTV.text = "Направление ветра: ${data.wind.deg}°"
-                                windSpeedTV.text = "Скорость ветра: ${data.wind.speed} м/с"
+                                binding.cityTv.text = data.name
+                                binding.temperatureTv.text = "${data.main.temp} °C"
+                                binding.maxTemperatureTv.text = "Макс: ${data.main.temp_max} °C"
+                                binding.minTemperatureTv.text = "Мин: ${data.main.temp_min} °C"
+                                binding.windDegreeTv.text = "Направление ветра: ${data.wind.deg}°"
+                                binding.windSpeedTv.text = "Скорость ветра: ${data.wind.speed} м/с"
                                 val convertPressure = (data.main.pressure / 1.33).toInt()
-                                pressureTV.text = "Давление: $convertPressure мм рт. ст."
-                                humidityTV.text = "Влажность: ${data.main.humidity}%"
+                                binding.pressureTv.text = "Давление: $convertPressure мм рт. ст."
+                                binding.humidityTv.text = "Влажность: ${data.main.humidity}%"
                                 val iconId = data.weather[0].icon
                                 val iconUrl = "https://openweathermap.org/img/wn/$iconId@4x.png"
-                                Picasso.get().load(iconUrl).into(weatherIV)
+                                Picasso.get().load(iconUrl).into(binding.weatherIv)
                             }
                         }
                     }
                 }
             }
-    }
+
+   }
+
 }

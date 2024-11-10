@@ -1,4 +1,4 @@
-package com.example.retrofiteweatherapi.utils
+package com.example.bottomnavigationview.data.model.weatherRetrofit.utils
 
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory

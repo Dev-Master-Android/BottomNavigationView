@@ -1,22 +1,25 @@
 package com.example.bottomnavigationview.ui.fragments
 
+import android.graphics.Paint
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.CheckBox
-import android.widget.ImageView
-import android.widget.TextView
+import android.widget.Toast
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.example.bottomnavigationview.R
 import com.example.bottomnavigationview.data.model.Note
+import com.example.bottomnavigationview.databinding.ListItemNoteBinding
 
-class NoteAdapter(private val onNoteClick: (Note, Any?) -> Unit, private val onCheckboxChecked: (Note, Boolean) -> Unit) : ListAdapter<Note, NoteAdapter.NoteViewHolder>(DiffCallback()) {
+class NoteAdapter(
+    private val onNoteClick: (Note, Any?) -> Unit,
+    private val onCheckboxChecked: (Note, Boolean) -> Unit
+) : ListAdapter<Note, NoteAdapter.NoteViewHolder>(DiffCallback()) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): NoteViewHolder {
-        val view = LayoutInflater.from(parent.context).inflate(R.layout.list_item_note, parent, false)
-        return NoteViewHolder(view)
+        val binding = ListItemNoteBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+        return NoteViewHolder(binding)
     }
 
     override fun onBindViewHolder(holder: NoteViewHolder, position: Int) {
@@ -24,29 +27,28 @@ class NoteAdapter(private val onNoteClick: (Note, Any?) -> Unit, private val onC
         holder.bind(note)
     }
 
-    inner class NoteViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        private val checkBox: CheckBox = itemView.findViewById(R.id.noteCheckbox)
-        private val title: TextView = itemView.findViewById(R.id.noteTitle)
-        private val deleteButton: ImageView = itemView.findViewById(R.id.deleteButton)
-
+    inner class NoteViewHolder(private val binding: ListItemNoteBinding) : RecyclerView.ViewHolder(binding.root) {
         init {
-            itemView.setOnClickListener {
+            binding.expandButton.setOnClickListener {
                 val position = adapterPosition
                 if (position != RecyclerView.NO_POSITION) {
                     val note = getItem(position)
-                    onNoteClick(note, true)
+                    note.isExpanded = !note.isExpanded
+                    itemView.post { notifyItemChanged(position) }
                 }
             }
 
-            checkBox.setOnCheckedChangeListener { _, isChecked ->
+            binding.noteCheckbox.setOnCheckedChangeListener { _, isChecked ->
                 val position = adapterPosition
                 if (position != RecyclerView.NO_POSITION) {
                     val note = getItem(position)
                     onCheckboxChecked(note, isChecked)
+                    note.isCompleted = isChecked
+                    itemView.post { notifyItemChanged(position) }
                 }
             }
 
-            deleteButton.setOnClickListener {
+            binding.deleteButton.setOnClickListener {
                 val position = adapterPosition
                 if (position != RecyclerView.NO_POSITION) {
                     val note = getItem(position)
@@ -56,8 +58,21 @@ class NoteAdapter(private val onNoteClick: (Note, Any?) -> Unit, private val onC
         }
 
         fun bind(note: Note) {
-            checkBox.isChecked = note.isCompleted
-            title.text = note.title
+            binding.noteCheckbox.isChecked = note.isCompleted
+            binding.noteTitle.text = note.title
+            binding.noteContent.text = note.content
+            binding.noteContent.visibility = if (note.isExpanded) View.VISIBLE else View.GONE
+            binding.expandButton.setImageResource(
+                if (note.isExpanded) R.drawable.ic_arrow_up else R.drawable.ic_arrow_down
+            )
+
+            if (note.isCompleted) {
+                binding.noteTitle.paintFlags = binding.noteTitle.paintFlags or Paint.STRIKE_THRU_TEXT_FLAG
+            } else {
+                binding.noteTitle.paintFlags = binding.noteTitle.paintFlags and Paint.STRIKE_THRU_TEXT_FLAG.inv()
+            }
+
+            binding.noteTitle.isSelected = true // This line makes the TextView scrollable horizontally
         }
     }
 

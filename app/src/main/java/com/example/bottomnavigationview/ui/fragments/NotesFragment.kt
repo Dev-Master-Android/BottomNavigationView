@@ -5,6 +5,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.EditText
+import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -64,9 +65,12 @@ class NotesFragment : Fragment() {
                         id = 0,
                         title = title,
                         content = content,
-                        isCompleted = false
+                        isCompleted = false,
+                        isExpanded = false
                     )
                     noteViewModel.insert(newNote)
+                } else {
+                    Toast.makeText(context, "Введите название и описание заметки", Toast.LENGTH_SHORT).show()
                 }
             }
             .setNegativeButton("Отмена", null)
@@ -93,6 +97,8 @@ class NotesFragment : Fragment() {
                         content = updatedContent
                     )
                     noteViewModel.update(updatedNote)
+                } else {
+                    Toast.makeText(context, "Введите название и описание заметки", Toast.LENGTH_SHORT).show()
                 }
             }
             .setNegativeButton("Удалить") { _, _ ->

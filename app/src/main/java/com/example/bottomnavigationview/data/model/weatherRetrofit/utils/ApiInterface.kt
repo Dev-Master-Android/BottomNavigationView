@@ -1,6 +1,6 @@
-package com.example.retrofiteweatherapi.utils
+package com.example.bottomnavigationview.data.model.weatherRetrofit.utils
 
-import com.example.retrofiteweatherapi.models.CurrentWeather
+import com.example.bottomnavigationview.data.model.weatherRetrofit.models.CurrentWeather
 import retrofit2.Response
 import retrofit2.http.GET
 import retrofit2.http.Query

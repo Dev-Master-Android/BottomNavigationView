@@ -1,4 +1,4 @@
-package com.example.retrofiteweatherapi.models
+package com.example.bottomnavigationview.data.model.weatherRetrofit.models
 
 data class Wind(
     val deg: Int,

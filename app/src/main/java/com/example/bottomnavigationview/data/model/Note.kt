@@ -8,5 +8,6 @@ data class Note(
     @PrimaryKey(autoGenerate = true) val id: Int,
     val title: String,
     val content: String,
-    var isCompleted: Boolean = false
+    var isCompleted: Boolean = false,
+    var isExpanded: Boolean = false
 )
